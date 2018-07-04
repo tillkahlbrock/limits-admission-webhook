@@ -1,0 +1,5 @@
+package: github.com/tillkahlbrock/limits-admission-webhook
+import:
+- package: k8s.io/api
+  subpackages:
+  - admission/v1beta1
