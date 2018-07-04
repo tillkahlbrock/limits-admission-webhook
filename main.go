@@ -20,8 +20,8 @@ import (
 var codecs = serializer.NewCodecFactory(runtime.NewScheme())
 
 func main() {
-	http.HandleFunc("/check-limits", handle)
-	log.Fatal(http.ListenAndServe(":80", nil))
+	http.HandleFunc("/", handle)
+	log.Fatal(http.ListenAndServeTLS(":443", "/app/server.crt", "/app/server.key", nil))
 }
 
 func handle(w http.ResponseWriter, r *http.Request) {
