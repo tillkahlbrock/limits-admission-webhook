@@ -1,4 +1,4 @@
-IMAGE := till/law
+IMAGE := till/law:$(VERSION)
 
 .DEFAULT_GOAL := build
 
@@ -8,5 +8,10 @@ build:
 test:
 	go test $$(go list ./... | grep -v vendor)
 
-image:
+image: require-version
 	docker build -t $(IMAGE) .
+
+require-version:
+ifndef VERSION
+	$(error VERSION needs to be set)
+endif
