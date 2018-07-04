@@ -23,7 +23,7 @@ func TestDenyNonDeploymentResources(t *testing.T) {
 }
 
 func TestDenyDeploymentsWithoutLimits(t *testing.T) {
-	deploymentResource := metav1.GroupVersionResource{Group: "", Version: "v1", Resource: "deployments"}
+	deploymentResource := metav1.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}
 
 	raw, _ := json.Marshal(aDeploymentWithOutLimits())
 
@@ -34,7 +34,7 @@ func TestDenyDeploymentsWithoutLimits(t *testing.T) {
 }
 
 func TestAllowDeploymentsWithLimits(t *testing.T) {
-	deploymentResource := metav1.GroupVersionResource{Group: "", Version: "v1", Resource: "deployments"}
+	deploymentResource := metav1.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}
 
 	raw, _ := json.Marshal(aDeploymentWithLimits())
 

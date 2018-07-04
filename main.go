@@ -79,7 +79,7 @@ func toAdmissionResponse(err error) *v1beta1.AdmissionResponse {
 
 // CheckDeploymentForLimits ensures that a reviewed deployment has limits set
 func CheckDeploymentForLimits(aReq v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
-	deploymentResource := metav1.GroupVersionResource{Group: "", Version: "v1", Resource: "deployments"}
+	deploymentResource := metav1.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}
 	if aReq.Request.Resource != deploymentResource {
 		err := fmt.Errorf("expect resource to be %s", deploymentResource)
 		glog.Error(err)
