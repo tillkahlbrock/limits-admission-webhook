@@ -6,13 +6,18 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"reflect"
 
 	"github.com/golang/glog"
 	"k8s.io/api/admission/v1beta1"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 )
+
+var codecs = serializer.NewCodecFactory(runtime.NewScheme())
 
 func main() {
 	http.HandleFunc("/check-limits", handle)
@@ -36,7 +41,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 
 	var reviewResponse *v1beta1.AdmissionResponse
 	ar := v1beta1.AdmissionReview{}
-	codecs := serializer.NewCodecFactory(runtime.NewScheme())
+
 	deserializer := codecs.UniversalDeserializer()
 	if _, _, err := deserializer.Decode(body, nil, &ar); err != nil {
 		glog.Error(err)
@@ -80,5 +85,26 @@ func CheckDeploymentForLimits(aReq v1beta1.AdmissionReview) *v1beta1.AdmissionRe
 		glog.Error(err)
 		return toAdmissionResponse(err)
 	}
+
+	raw := aReq.Request.Object.Raw
+	deployment := appsv1.Deployment{}
+	deserializer := codecs.UniversalDeserializer()
+	if _, _, err := deserializer.Decode(raw, nil, &deployment); err != nil {
+		glog.Error(err)
+		return toAdmissionResponse(err)
+	}
+
+	if hasNoLimits(deployment) {
+		return toAdmissionResponse(fmt.Errorf("no resource limits set"))
+	}
 	return &v1beta1.AdmissionResponse{Allowed: true}
+}
+
+func hasNoLimits(d appsv1.Deployment) bool {
+	for _, c := range d.Spec.Template.Spec.Containers {
+		if reflect.DeepEqual(c.Resources, corev1.ResourceRequirements{}) {
+			return true
+		}
+	}
+	return false
 }
