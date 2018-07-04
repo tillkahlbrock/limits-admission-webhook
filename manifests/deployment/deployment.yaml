@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: law-deployment
+  labels:
+    app: law
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: law
+  template:
+    metadata:
+      labels:
+        app: law
+    spec:
+      containers:
+      - name: law
+        image: till/law:4
+        ports:
+        - containerPort: 443
